@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home page bountiful</title>
+
+    <!-- Normalize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+
+    <link href="styles/base.css" rel="stylesheet">
+    <link href="styles/medium.css" rel="stylesheet">
+    <link href="styles/large.css" rel="stylesheet">
+
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <header>
+        <p class="logo">Fresh<strong class="point-logo">.</strong></p>
+        <div id="hamburgerBtn"><span><strong>&#9776;</strong></span><span><strong>X</strong></span></div>
+        <nav>
+            <ul id="primaryNav">
+                <li><a href="bountiful.html"><strong>Home</strong></a></li>
+                <li><a href="about.html"><strong>About Us</strong></a></li>
+                <li><a class="active" href="fresh.html"><strong>Fresh</strong></a></li>
+            </ul>
+        </nav>
+        <hr id="hr-nav">
+    </header>
+
+    <main class="grid-fresh">
+        <h2 class="bigger-h">Make your own <strong class="point-logo">Drink!</strong></h2>
+        <form id="mix-form">
+            <input type="date" name="date" hidden id="date">
+            
+            <label class="margin-just" for="fName">
+                First Name<span class="req-f">*</span> <br>
+                <input name="fName" type="text" class="input-box" id='fName' required>
+            </label>
+
+            <label class="margin-just" for="email">
+                Email<span class="req-f">*</span><br>
+                <input name="email" type="email" id="email" class="input-box" required>
+            </label>
+
+            <!-- Bouton Paiement -->
+            <button id="payButton" type="button">Payer</button>
+        </form>
+    </main>
+
+    <script>
+        const stripe = Stripe('pk_test_VOTRE_CLE_PUBLIQUE'); // Remplacer par ta clé publique Stripe !
+
+        document.getElementById('payButton').addEventListener('click', async () => {
+            const fName = document.getElementById('fName').value;
+            const email = document.getElementById('email').value;
+
+            if (!fName || !email) {
+                alert("Merci de remplir tous les champs !");
+                return;
+            }
+
+            const response = await fetch('/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fName, email }),
+            });
+
+            const session = await response.json();
+
+            await stripe.redirectToCheckout({ sessionId: session.id });
+        });
+    </script>
+</body>
+</html>
